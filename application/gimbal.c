@@ -9,7 +9,7 @@
 #include "bsp_can.h"
 #include "pid.h"
 
-/* ============ ÒµÎñ±äÁ¿ ============ */
+/* ============ Òµï¿½ï¿½ï¿½ï¿½ï¿½ ============ */
 float test_iput_angle;
 int test_out;
 float test_angle_flag;
@@ -20,15 +20,15 @@ float fake_set;
 const imu_angle_t *imu_gimbal;
 const motor_system_t *motor_gimbal;
 
-/* ============ Õï¶Ï±äÁ¿(ÓÃ VOFA »ò watch ¼àÊÓ) ============ */
-volatile uint8_t  gimbal_stage = 0;          /* task µ±Ç°Ö´ÐÐµ½ÄÄÒ»²½ 1-5 */
-volatile uint32_t gimbal_loop_count = 0;     /* task ÍêÕûÑ­»·¼ÆÊý */
-volatile uint32_t gimbal_last_tick = 0;      /* task ×îºóÒ»´ÎÔËÐÐÊ±µÄ HAL tick */
-volatile uint32_t gimbal_curr_tick = 0;      /* µ±Ç° HAL tick */
-volatile uint32_t gimbal_tick_delta = 0;     /* Á½´ÎÑ­»·¼ä¸ôµÄ tick ²î */
-volatile uint32_t can_tx_fail_count = 0;     /* CAN ·¢ËÍÊ§°Ü¼ÆÊý */
+/* ============ ï¿½ï¿½Ï±ï¿½ï¿½ï¿½(ï¿½ï¿½ VOFA ï¿½ï¿½ watch ï¿½ï¿½ï¿½ï¿½) ============ */
+volatile uint8_t  gimbal_stage = 0;          /* task ï¿½ï¿½Ç°Ö´ï¿½Ðµï¿½ï¿½ï¿½Ò»ï¿½ï¿½ 1-5 */
+volatile uint32_t gimbal_loop_count = 0;     /* task ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+volatile uint32_t gimbal_last_tick = 0;      /* task ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ HAL tick */
+volatile uint32_t gimbal_curr_tick = 0;      /* ï¿½ï¿½Ç° HAL tick */
+volatile uint32_t gimbal_tick_delta = 0;     /* ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ tick ï¿½ï¿½ */
+volatile uint32_t can_tx_fail_count = 0;     /* CAN ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü¼ï¿½ï¿½ï¿½ */
 
-/* ============ ÕýÏÒ²ÎÊý ============ */
+/* ============ ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ ============ */
 sine_sweep test_angle_sin = {
     .amplitude = 80.0f,
     .frequency = 0.2f,
@@ -38,27 +38,27 @@ sine_sweep test_angle_sin = {
     .time_all  = 0.0f
 };
 
-/* ============ ÈÎÎñÊµÏÖ ============ */
+/* ============ ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ ============ */
 void gimbal_task(void const *pvParameters)
 {
     motor_gimbal = get_pitch_gimbal_motor_measure_point();
     
-    /* ³õÊ¼»¯Ê±¿Ì */
+    /* ï¿½ï¿½Ê¼ï¿½ï¿½Ê±ï¿½ï¿½ */
     gimbal_last_tick = HAL_GetTick();
     
     while(1)
     {
-        /* ½×¶Î1:ÕýÏÒÄ¿±ê¼ÆËã */
+        /* ï¿½×¶ï¿½1:ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ */
         gimbal_stage = 1;
         test_angle_flag = sine_target_int(&test_angle_sin);
         
-        /* ½×¶Î2:½Ç¶ÈÎó²î¹éÒ»»¯ */
+        /* ï¿½×¶ï¿½2:ï¿½Ç¶ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ */
         gimbal_stage = 2;
         float cur_angle = motor_gimbal->can1_motors.back_left.angle;
         angle_diff = normalize_angle(test_angle_flag - cur_angle);
         fake_set = cur_angle + angle_diff;
         
-        /* ½×¶Î3:PID ¼ÆËã */
+        /* ï¿½×¶ï¿½3:PID ï¿½ï¿½ï¿½ï¿½ */
         gimbal_stage = 3;
         test_iput_angle = (float)PID_calc(&all_motor_pid.pid_test_angle, 
                                           motor_gimbal->can1_motors.back_left.angle, 
@@ -67,18 +67,18 @@ void gimbal_task(void const *pvParameters)
                                  motor_gimbal->can1_motors.back_left.speed_rpm, 
                                  test_iput_angle);
         
-        /* ½×¶Î4:CAN ·¢ËÍ */
+        /* ï¿½×¶ï¿½4:CAN ï¿½ï¿½ï¿½ï¿½ */
         gimbal_stage = 4;
         CAN_cmd_chassis(0, 0, test_out, 0);
         
-        /* ½×¶Î5:Ñ­»·¼ÆÊý + tick ¼à¿Ø */
+        /* ï¿½×¶ï¿½5:Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ + tick ï¿½ï¿½ï¿½ */
         gimbal_stage = 5;
         gimbal_loop_count++;
         gimbal_curr_tick = HAL_GetTick();
         gimbal_tick_delta = gimbal_curr_tick - gimbal_last_tick;
         gimbal_last_tick = gimbal_curr_tick;
         
-        /* ½×¶Î6:ÑÓÊ±(¹ÊÕÏÊ±´ó¸ÅÂÊ¿¨ÔÚÕâÀï) */
+        /* ï¿½×¶ï¿½6:ï¿½ï¿½Ê±(ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ê¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) */
         gimbal_stage = 6;
         osDelay(2);
     }
