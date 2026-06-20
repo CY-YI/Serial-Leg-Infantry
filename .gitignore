@@ -1,0 +1,71 @@
+# ============================================
+#  Keil MDK-ARM / STM32CubeMX / EIDE
+# ============================================
+
+# --- Build outputs ---
+*.o
+*.d
+*.crf
+*.axf
+*.elf
+*.hex
+*.bin
+*.map
+*.htm
+*.lst
+*.iex
+*.dep
+*.fed
+build/
+bin/
+obj/
+out/
+
+# --- Keil uVision user files ---
+*.uvguix.*
+*.uvoptx
+*.uvguix.*.bak
+*.uvoptx.bak
+JLinkLog.txt
+JLinkSettings.ini
+
+# --- EIDE ---
+.eide/log/
+.eide.usr.ctx.json
+*.ept
+*.eide-template
+
+# --- VS Code ---
+.vscode/browse.vc.db
+.vscode/.browse/
+.vscode/ipch/
+.vscode/*.db
+.vscode/*.log
+
+# --- Backup files ---
+*.bak
+*.bak2
+*.orig
+
+# --- OS junk ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+*~
+
+# --- Keil build output directory ---
+MDK-ARM/Serial Leg Infantry/
+
+# --- Generated linker files ---
+*.lnp
+
+# --- Log files ---
+*.log
+*.log.lock
+
+# --- Debug / RTE ---
+DebugConfig/
+RTE/
+
+# --- Misc ---
+*.scvd

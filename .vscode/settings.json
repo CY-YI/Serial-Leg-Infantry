@@ -1,0 +1,9 @@
+{
+    "clangd.enabled": false,
+    "stm32cube-ide-clangd.enabled": false,
+    "C_Cpp.intelliSenseEngine": "default",
+    "files.associations": {
+        "*.c": "c",
+        "*.h": "c"
+    }
+}
