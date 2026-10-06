@@ -41,6 +41,9 @@ JLinkSettings.ini
 .vscode/ipch/
 .vscode/*.db
 .vscode/*.log
+# 任意层级子目录下的 .vscode 构建产物（如 MDK-ARM/.vscode/BROWSE.VC.DB）
+**/.vscode/*.db
+**/.vscode/*.db-shm
 
 # --- Backup files ---
 *.bak
@@ -69,3 +72,6 @@ RTE/
 
 # --- Misc ---
 *.scvd
+
+# --- 编码转换时的原文件备份（由 tools/fix_encoding.py 生成，不入库）---
+_encoding_backup/

@@ -2,6 +2,9 @@
     "clangd.enabled": false,
     "stm32cube-ide-clangd.enabled": false,
     "C_Cpp.intelliSenseEngine": "default",
+    "// 编码说明": "工程统一用 UTF-8 带BOM：VSCode 正常显示中文注释，Keil AC5 识别 BOM 后也不会乱码",
+    "files.encoding": "utf8bom",
+    "files.autoGuessEncoding": false,
     "files.associations": {
         "*.c": "c",
         "*.h": "c"
