@@ -1,4 +1,4 @@
-#include "stm32f4xx_hal.h"  // ±ØĞëÏÈ°üº¬HAL¿â×ÜÍ·ÎÄ¼ş
+ï»¿#include "stm32f4xx_hal.h"  // å¿…é¡»å…ˆåŒ…å«HALåº“æ€»å¤´æ–‡ä»¶
 
 #include "filtering.h"
 #include "bsp_usart.h"
@@ -8,14 +8,14 @@
 #include "gimbal.h"
 
 #include <string.h>    /* strlen, memcpy */
-#include <stdio.h>     /* snprintf  ¡û ¹Ø¼ü */
+#include <stdio.h>     /* snprintf  â† å…³é”® */
 extern UART_HandleTypeDef huart1;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 
 
-volatile uint8_t g_usart1_tx_busy = 0;                             // ·¢ËÍ×´Ì¬±êÖ¾
-volatile uint8_t g_current_tx_idx = 0;                            // µ±Ç°DMAÕıÔÚ·¢ËÍµÄ»º³åÇøË÷Òı£¨0/1£©
+volatile uint8_t g_usart1_tx_busy = 0;                             // å‘é€çŠ¶æ€æ ‡å¿—
+volatile uint8_t g_current_tx_idx = 0;                            // å½“å‰DMAæ­£åœ¨å‘é€çš„ç¼“å†²åŒºç´¢å¼•ï¼ˆ0/1ï¼‰
 
 
 uint8_t usart1_dma_tx_buf[2][MAX_TX_LEN];
@@ -29,7 +29,6 @@ const motor_system_t *motor_test;
 uint16_t pack_gyro_data_to_buf(uint8_t *tx_buf);
 void usart1_send_gyro_init(void);
  
-
 
 void Serial_test_int(void)
 {
@@ -62,12 +61,12 @@ uint16_t pack_gyro_data_to_buf(uint8_t *tx_buf)
     float a = motor_test->can1_motors.back_left.speed_rpm;
     float b = test_angle_flag;
     float c = motor_test->can1_motors.back_left.angle;
- //»ı·Ö   float d = integrator_update(&gy_integrator, c);   
+ //ç§¯åˆ†   float d = integrator_update(&gy_integrator, c);   
     float d = test_iput_angle;
     char *buf = (char *)tx_buf;
     uint16_t len = 0;
     
-    /* ·¢ËÍ 4 ¸öÊı¾İ:pitch, gyÔ­Ê¼, gyÂË²¨, gy»ı·ÖµÃµ½µÄ½Ç¶È */
+    /* å‘é€ 4 ä¸ªæ•°æ®:pitch, gyåŸå§‹, gyæ»¤æ³¢, gyç§¯åˆ†å¾—åˆ°çš„è§’åº¦ */
     len += float_to_str(buf + len, MAX_TX_LEN - len, a, 3);
     if (len < MAX_TX_LEN) buf[len++] = ',';
     len += float_to_str(buf + len, MAX_TX_LEN - len, b, 3);
@@ -90,13 +89,13 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1 && g_usart1_tx_busy == 1)
     {
-        // 1. ¼ÆËã´ı¸üĞÂµÄ»º³åÇøË÷Òı£¨Óëµ±Ç°·¢ËÍË÷ÒıÏà·´£¬±ÜÃâ¸²¸Ç£©
+        // 1. è®¡ç®—å¾…æ›´æ–°çš„ç¼“å†²åŒºç´¢å¼•ï¼ˆä¸å½“å‰å‘é€ç´¢å¼•ç›¸åï¼Œé¿å…è¦†ç›–ï¼‰
         uint8_t update_idx = (g_current_tx_idx == 0) ? 1 : 0;
 
-        // 2. ÖĞ¶ÏÄÚ¸üĞÂ¡¸·Çµ±Ç°·¢ËÍ¡¹µÄ»º³åÇø£¨¹Ø¼ü£ºDMAÕıÔÚ·¢ËÍg_current_tx_idx£¬¸üĞÂupdate_idxÎŞ³åÍ»£©
+        // 2. ä¸­æ–­å†…æ›´æ–°ã€Œéå½“å‰å‘é€ã€çš„ç¼“å†²åŒºï¼ˆå…³é”®ï¼šDMAæ­£åœ¨å‘é€g_current_tx_idxï¼Œæ›´æ–°update_idxæ— å†²çªï¼‰
        uint16_t len = pack_gyro_data_to_buf(usart1_dma_tx_buf[update_idx]);
        
-        // 3. ÇĞ»»Ë÷Òı£ºÏÂÒ»´ÎDMAÑ­»·×Ô¶¯·¢ËÍ¸üĞÂºóµÄ»º³åÇø
+        // 3. åˆ‡æ¢ç´¢å¼•ï¼šä¸‹ä¸€æ¬¡DMAå¾ªç¯è‡ªåŠ¨å‘é€æ›´æ–°åçš„ç¼“å†²åŒº
        g_current_tx_idx = update_idx;
     	HAL_UART_Transmit_DMA(&huart1, usart1_dma_tx_buf[update_idx], len);	
         

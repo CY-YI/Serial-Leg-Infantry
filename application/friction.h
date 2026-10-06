@@ -1,15 +1,15 @@
-#ifndef friction_H
+﻿#ifndef friction_H
 #define friction_H
 #include "main.h"
 
 #define ball_ecd  -49256
 typedef enum
 {
-  Friction_OFF,   //Ħ���ֹر�
+  Friction_OFF,   //摩擦轮关闭
 													
-  Friction_ON,    //Ħ���ִ�
+  Friction_ON,    //摩擦轮打开
 
-	shoot_mode,			//���ģʽ
+	shoot_mode,			//射击模式
 
 } friction_mode_e;
 

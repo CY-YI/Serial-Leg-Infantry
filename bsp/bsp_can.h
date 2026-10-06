@@ -1,4 +1,4 @@
-#ifndef BSP_CAN_H
+ï»¿#ifndef BSP_CAN_H
 #define BSP_CAN_H
 
 
@@ -13,48 +13,48 @@
 
 typedef struct
 {
-    // ========== ´Ó CAN ±¨ÎÄÖ±½Ó¶ÁÈ¡ ==========
-    uint16_t ecd;          // Ô­Ê¼±àÂëÆ÷Öµ 0~8191
-    int16_t  speed_rpm;    // ×ª×Ó×ªËÙ RPM
-    int16_t  given_current;      // Êµ¼ÊÊä³öµçÁ÷
-    uint8_t  temperate;         // ÎÂ¶È
+    // ========== ä» CAN æŠ¥æ–‡ç›´æ¥è¯»å– ==========
+    uint16_t ecd;          // åŸå§‹ç¼–ç å™¨å€¼ 0~8191
+    int16_t  speed_rpm;    // è½¬å­è½¬é€Ÿ RPM
+    int16_t  given_current;      // å®é™…è¾“å‡ºç”µæµ
+    uint8_t  temperate;         // æ¸©åº¦
 
-    // ========== ¼ÆËãÁ¬ĞøÎ»ÖÃ£¨±ØĞë£© ==========
-    uint16_t last_ecd;     // ÉÏÒ»´Î±àÂëÆ÷Öµ
-    int32_t  diff;         // ±àÂëÆ÷±ä»¯Á¿
-    int32_t  total_round;  // ×ÜÈ¦Êı
-    int32_t  total_ecd;    // Á¬Ğø±àÂëÖµ£¨´øÈ¦Êı£¬¿ÉÕı¿É¸º£©
+    // ========== è®¡ç®—è¿ç»­ä½ç½®ï¼ˆå¿…é¡»ï¼‰ ==========
+    uint16_t last_ecd;     // ä¸Šä¸€æ¬¡ç¼–ç å™¨å€¼
+    int32_t  diff;         // ç¼–ç å™¨å˜åŒ–é‡
+    int32_t  total_round;  // æ€»åœˆæ•°
+    int32_t  total_ecd;    // è¿ç»­ç¼–ç å€¼ï¼ˆå¸¦åœˆæ•°ï¼Œå¯æ­£å¯è´Ÿï¼‰
 
-    // ========== ¼ÆËã½Ç¶È£¨¿ÉÑ¡£¬·Ç³£ÊµÓÃ£©==========
-    float    angle;        // ×Ü½Ç¶È£¨¡ã£©£¬360¡ãÖÆ
-    float    total_angle;  // ¾ø¶Ô×Ü½Ç¶È£¨¿ÉÎŞÏŞ´ó£©
+    // ========== è®¡ç®—è§’åº¦ï¼ˆå¯é€‰ï¼Œéå¸¸å®ç”¨ï¼‰==========
+    float    angle;        // æ€»è§’åº¦ï¼ˆÂ°ï¼‰ï¼Œ360Â°åˆ¶
+    float    total_angle;  // ç»å¯¹æ€»è§’åº¦ï¼ˆå¯æ— é™å¤§ï¼‰
 
 } motor_measure_temp;
 
 
 
 typedef struct {         
-    motor_measure_temp front_left;  // µ×ÅÌÇ°×ó (ID1)
-    motor_measure_temp front_right;   // µ×ÅÌÇ°×ó (ID2)
-    motor_measure_temp back_left;    // µ×ÅÌºóÓÒ (ID3)
-    motor_measure_temp back_right;   // µ×ÅÌºóÓÒ (ID4)
+    motor_measure_temp front_left;  // åº•ç›˜å‰å·¦ (ID1)
+    motor_measure_temp front_right;   // åº•ç›˜å‰å·¦ (ID2)
+    motor_measure_temp back_left;    // åº•ç›˜åå³ (ID3)
+    motor_measure_temp back_right;   // åº•ç›˜åå³ (ID4)
     motor_measure_temp yaw;          // yaw (ID5)
-    motor_measure_temp super_cap;    // ³¬¼¶µçÈİ (ID6)
+    motor_measure_temp super_cap;    // è¶…çº§ç”µå®¹ (ID6)
 } can1_motors_t;
 
-// CAN2 ×ÜÏßµÄÉè±¸½á¹¹Ìå£¨°üº¬ 4 ¸öÉè±¸£©
+// CAN2 æ€»çº¿çš„è®¾å¤‡ç»“æ„ä½“ï¼ˆåŒ…å« 4 ä¸ªè®¾å¤‡ï¼‰
 typedef struct {
     motor_measure_temp pitch;      // pitchI (ID6)
-    motor_measure_temp friction_left; // Ä¦²ÁÂÖ×ó (ID1)
-    motor_measure_temp friction_right; // Ä¦²ÁÂÖÓÒ (ID2)
-    motor_measure_temp pop_up_wheel; // ²¦µ¯ÂÖ (ID3)
+    motor_measure_temp friction_left; // æ‘©æ“¦è½®å·¦ (ID1)
+    motor_measure_temp friction_right; // æ‘©æ“¦è½®å³ (ID2)
+    motor_measure_temp pop_up_wheel; // æ‹¨å¼¹è½® (ID3)
 } can2_motors_t;
 
 
-// µç»úÏµÍ³½á¹¹Ìå£¬¹ÜÀíÕû¸öÏµÍ³µÄµç»úĞÅÏ¢
+// ç”µæœºç³»ç»Ÿç»“æ„ä½“ï¼Œç®¡ç†æ•´ä¸ªç³»ç»Ÿçš„ç”µæœºä¿¡æ¯
 typedef struct {
-    can1_motors_t can1_motors; // ´æ´¢ CAN1 ÉÏ 6 ¸öÉè±¸µÄĞÅÏ¢
-    can2_motors_t can2_motors; // ´æ´¢ CAN2 ÉÏ 4 ¸öÉè±¸µÄĞÅÏ¢
+    can1_motors_t can1_motors; // å­˜å‚¨ CAN1 ä¸Š 6 ä¸ªè®¾å¤‡çš„ä¿¡æ¯
+    can2_motors_t can2_motors; // å­˜å‚¨ CAN2 ä¸Š 4 ä¸ªè®¾å¤‡çš„ä¿¡æ¯
 } motor_system_t;
 
 

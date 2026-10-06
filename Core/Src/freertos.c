@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+ï»¿/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : freertos.c
@@ -128,7 +128,7 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(imuTask, INS_task, osPriorityRealtime, 0, 1024);
   imuTaskHandle = osThreadCreate(osThread(imuTask), NULL);
   
-  // ¶¨Òå²¢´´½¨ gimbal ÈÎÎñ
+  // å®šä¹‰å¹¶åˆ›å»º gimbal ä»»åŠ¡
   osThreadDef(gimbal, gimbal_task, osPriorityHigh, 0, 1024);
   gimbalHandle = osThreadCreate(osThread(gimbal), NULL);
 		

@@ -1,4 +1,4 @@
-#include "pid_init.h"
+Ôªø#include "pid_init.h"
 #include "pid.h"
 #include "main.h"
 
@@ -70,7 +70,7 @@ void pid_all_init(void){
 		 700);     
 //----------------------------------------------------  
     
-    //µ◊≈Ã
+    //Â∫ïÁõò
 	PID_init(&all_motor_pid.pid_front_right,
 		 PID_POSITION,
 		 all_motor_pid.pid_front_right.pid_parameter,
@@ -98,7 +98,7 @@ void pid_all_init(void){
          
          
          
-         //‘∆Ã®
+         //‰∫ëÂè∞
          
 PID_init(&all_motor_pid.pid_pitchI_angle,
 		 PID_DELTA,
@@ -139,7 +139,7 @@ PID_init(&all_motor_pid.pid_yaw_speed,
 		 10);		 
 		
 
-//∑¢…‰ª˙ππ
+//ÂèëÂ∞ÑÊú∫ÊûÑ
 		 PID_init(&all_motor_pid.pid_friction_left,
 		 PID_POSITION,
 		 all_motor_pid.pid_friction_left.pid_parameter,

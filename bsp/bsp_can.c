@@ -1,4 +1,4 @@
-#include "bsp_can.h"
+ï»¿#include "bsp_can.h"
 #include "main.h"
 
 static CAN_TxHeaderTypeDef  chassis_tx_message;
@@ -15,9 +15,9 @@ motor_system_t motor;
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
-/* ÔÚÎÄ¼ş¶¥²¿¼ÓÈ«¾Ö±äÁ¿ */
-extern volatile uint32_t gimbal_curr_tick;   /* gimbal.c Àï¶¨ÒåµÄ */
-extern volatile uint32_t gimbal_loop_count ;            /* CAN ½ÓÊÕÖ¡¼ÆÊı */
+/* åœ¨æ–‡ä»¶é¡¶éƒ¨åŠ å…¨å±€å˜é‡ */
+extern volatile uint32_t gimbal_curr_tick;   /* gimbal.c é‡Œå®šä¹‰çš„ */
+extern volatile uint32_t gimbal_loop_count ;            /* CAN æ¥æ”¶å¸§è®¡æ•° */
 extern  volatile uint32_t gimbal_last_tick ;
 static uint32_t loop_unchanged_count = 0;
 
@@ -38,7 +38,7 @@ static uint32_t loop_unchanged_count = 0;
 //
 		
 	v->diff = v->ecd - v->last_ecd;
-	if(v->diff < -4096)    //Á½´Î±àÂëÆ÷µÄ·´À¡Öµ²î±ğÌ«´ó£¬±íÊ¾È¦Êı·¢ÉúÁË¸Ä±ä
+	if(v->diff < -4096)    //ä¸¤æ¬¡ç¼–ç å™¨çš„åé¦ˆå€¼å·®åˆ«å¤ªå¤§ï¼Œè¡¨ç¤ºåœˆæ•°å‘ç”Ÿäº†æ”¹å˜
 	{
 		v->total_round++;
 		//	v->ecd_raw_rate = v->diff + 8191;
@@ -52,7 +52,7 @@ static uint32_t loop_unchanged_count = 0;
 	{
 		//v->ecd_raw_rate = v->diff;
 	}
-	//¼ÆËãµÃµ½Á¬ĞøµÄ±àÂëÆ÷Êä³öÖµ
+	//è®¡ç®—å¾—åˆ°è¿ç»­çš„ç¼–ç å™¨è¾“å‡ºå€¼
 	v->total_ecd = v->ecd + v->total_round * 8192;
 
     
@@ -88,7 +88,7 @@ void can_filter_init(void)
 
 }
 
-/*can1µÄÖĞ¶Ï»Øµ÷º¯Êı*/
+/*can1çš„ä¸­æ–­å›è°ƒå‡½æ•°*/
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef rx_header;
@@ -143,7 +143,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		 }
 	}
 }
-//µçµ÷C620  0x200Îªid 1µ½4 0x1FFÎªid 4µ½8
+//ç”µè°ƒC620  0x200ä¸ºid 1åˆ°4 0x1FFä¸ºid 4åˆ°8
 void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
 {
     uint32_t send_mail_box;
@@ -164,15 +164,15 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
     chassis_can_send_data[6] = motor4 >> 8;
     chassis_can_send_data[7] = motor4;
 
-    /* Ã¿ 100 ´ÎÑ­»·¼ì²éÒ»´Î gimbal_task ĞÄÌø */
+    /* æ¯ 100 æ¬¡å¾ªç¯æ£€æŸ¥ä¸€æ¬¡ gimbal_task å¿ƒè·³ */
     if (gimbal_loop_count % 100 == 0) {
         if ((HAL_GetTick() - gimbal_curr_tick) >= 10) {
-            /* gimbal_task ³¬¹ı 10ms Î´¸üĞÂ */
+            /* gimbal_task è¶…è¿‡ 10ms æœªæ›´æ–° */
             loop_unchanged_count++;
 
-            /* Á¬Ğø 2 ´Î¼ì²â¶¼Ã»±ä»¯(=200ms task Í£ÅÜ)¡ú Ç¿ÖÆ·¢Áã */
+            /* è¿ç»­ 2 æ¬¡æ£€æµ‹éƒ½æ²¡å˜åŒ–(=200ms task åœè·‘)â†’ å¼ºåˆ¶å‘é›¶ */
             if (loop_unchanged_count >= 2) {
-                /* Ö±½ÓÔÚÕâÀï·¢ÁãÖ¸Áî,²»×ß gimbal_task */
+                /* ç›´æ¥åœ¨è¿™é‡Œå‘é›¶æŒ‡ä»¤,ä¸èµ° gimbal_task */
                 for (int i = 0; i < 8; i++) {
                     chassis_can_send_data[i] = 0;
                 }
@@ -181,7 +181,7 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
                 return;
             }
         } else {
-            /* task »¹ÔÚÅÜ,ÖØÖÃ¼ÆÊı */
+            /* task è¿˜åœ¨è·‘,é‡ç½®è®¡æ•° */
             gimbal_last_tick = gimbal_curr_tick;
             loop_unchanged_count = 0;
         }
@@ -189,7 +189,7 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
 
     HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
-//GM6020 0x1FFÎªid 1µ½4 0x2FFÎªid 4µ½8  0x1FEÎªÁ÷¿Ø
+//GM6020 0x1FFä¸ºid 1åˆ°4 0x2FFä¸ºid 4åˆ°8  0x1FEä¸ºæµæ§
 void CAN_cmd_yaw(int16_t motor1)
 {
     uint32_t send_mail_box;
@@ -221,7 +221,7 @@ void CAN_cmd_pitch(int16_t motor2)
 
 
 
-//µçµ÷C610,C620,820R  0x200Îªid 1µ½4 0x1FFÎªid 4µ½8
+//ç”µè°ƒC610,C620,820R  0x200ä¸ºid 1åˆ°4 0x1FFä¸ºid 4åˆ°8
 void CAN_cmd_friction(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
 {
     

@@ -1,13 +1,13 @@
-#ifndef _FILTERING_H
+ï»¿#ifndef _FILTERING_H
 #define _FILTERING_H
 
 #include "main.h"
 #include <stdint.h>
 
 typedef struct {
-    int32_t last_filtered;  // ÉÏÒ»´ÎÂË²¨½á¹û
-    uint16_t alpha_int;     // ÕûÊıĞÍÂË²¨ÏµÊı£¨0~1000£¬¶ÔÓ¦¦Á=0~1£©
-} LowPassFilter;            //Ò»½×µÍÍ¨ÂË²¨
+    int32_t last_filtered;  // ä¸Šä¸€æ¬¡æ»¤æ³¢ç»“æœ
+    uint16_t alpha_int;     // æ•´æ•°å‹æ»¤æ³¢ç³»æ•°ï¼ˆ0~1000ï¼Œå¯¹åº”Î±=0~1ï¼‰
+} LowPassFilter;            //ä¸€é˜¶ä½é€šæ»¤æ³¢
 
 
 typedef struct {
@@ -17,11 +17,11 @@ typedef struct {
 } integrator_t;
 
 typedef struct {
-  float amplitude ;     // ·ùÖµ
-  float frequency ;      // ÆµÂÊ Hz
-  float phase     ;      // ÏàÎ»
-  float offset    ;      // ÖĞĞÄÆ«ÖÃ
-  float time     ;      // Ê±¼äµ¥´ÎÀÛ¼ÓÖµ
+  float amplitude ;     // å¹…å€¼
+  float frequency ;      // é¢‘ç‡ Hz
+  float phase     ;      // ç›¸ä½
+  float offset    ;      // ä¸­å¿ƒåç½®
+  float time     ;      // æ—¶é—´å•æ¬¡ç´¯åŠ å€¼
   float time_all;
 }sine_sweep ;
 

@@ -1,14 +1,14 @@
-#include "filtering.h"
+ï»¿#include "filtering.h"
 #include <stdint.h>
 #include <math.h>
 
 #include <string.h>    /* strlen, memcpy */
-#include <stdio.h>     /* snprintf  ¡û ¹Ø¼ü */
+#include <stdio.h>     /* snprintf  â† å…³é”® */
 #define PI 3.1415926535f
-#define SYS_CLOCK_HZ 168000000U   /* ÄãµÄÖ÷Ê±ÖÓ,F407 Ò»°ãÊÇ 168 MHz,È·ÈÏÒ»ÏÂ */
+#define SYS_CLOCK_HZ 168000000U   /* ä½ çš„ä¸»æ—¶é’Ÿ,F407 ä¸€èˆ¬æ˜¯ 168 MHz,ç¡®è®¤ä¸€ä¸‹ */
 float dt;
 
-//----------------»ı·Ö
+//----------------ç§¯åˆ†
  void DWT_Init(void)
 {
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
@@ -27,19 +27,19 @@ float dt;
 {
     uint32_t now = DWT->CYCCNT;
     
-    /* µÚÒ»´Îµ÷ÓÃ,Ö»¼ÇÊ±¼ä²»»ı·Ö */
+    /* ç¬¬ä¸€æ¬¡è°ƒç”¨,åªè®°æ—¶é—´ä¸ç§¯åˆ† */
     if (!p->initialized) {
         p->last_cycle = now;
         p->initialized = 1;
         return p->integral;
     }
     
-    uint32_t diff = now - p->last_cycle;   /* 32 Î»¼õ·¨,×Ô¶¯´¦ÀíÒç³ö */
+    uint32_t diff = now - p->last_cycle;   /* 32 ä½å‡æ³•,è‡ªåŠ¨å¤„ç†æº¢å‡º */
     p->last_cycle = now;
     
      dt = (float)diff / (float)SYS_CLOCK_HZ;
     
-    /* ·ÀÓù:Èç¹û dt Òì³£´ó(±ÈÈç¶Ïµã»Ö¸´),Ìø¹ı */
+    /* é˜²å¾¡:å¦‚æœ dt å¼‚å¸¸å¤§(æ¯”å¦‚æ–­ç‚¹æ¢å¤),è·³è¿‡ */
     if (dt > 0.1f) return p->integral;
     
     p->integral += value * dt;
@@ -55,33 +55,33 @@ float dt;
 
 
 
-//--------------------------µÍÍ¨ÂË²¨
+//--------------------------ä½é€šæ»¤æ³¢
 void LowPassFilter_Init( LowPassFilter *filter, uint16_t alpha_int) {
     filter->last_filtered = 0;
-    filter->alpha_int = (alpha_int > 1000) ? 1000 : alpha_int;  // ÏŞÖÆ·¶Î§
+    filter->alpha_int = (alpha_int > 1000) ? 1000 : alpha_int;  // é™åˆ¶èŒƒå›´
 }
 
-// ÂË²¨´¦Àí£¨ÊäÈëÔ­Ê¼Êı¾İ£¬Êä³öÂË²¨ºóµÄÖµ£©
+// æ»¤æ³¢å¤„ç†ï¼ˆè¾“å…¥åŸå§‹æ•°æ®ï¼Œè¾“å‡ºæ»¤æ³¢åçš„å€¼ï¼‰
 int32_t LowPassFilter_Process(LowPassFilter *filter, int32_t raw_data) {
-    // ÕûÊıÔËËã±ÜÃâ¸¡µã£¬ÏÈ³Ëºó³ı£¨×¢Òâ£ºraw_dataºÍlast_filtered·¶Î§²»ÄÜÌ«´ó£¬±ÜÃâÒç³ö£©
+    // æ•´æ•°è¿ç®—é¿å…æµ®ç‚¹ï¼Œå…ˆä¹˜åé™¤ï¼ˆæ³¨æ„ï¼šraw_dataå’Œlast_filteredèŒƒå›´ä¸èƒ½å¤ªå¤§ï¼Œé¿å…æº¢å‡ºï¼‰
     filter->last_filtered = (filter->alpha_int * raw_data + (1000 - filter->alpha_int) * filter->last_filtered) / 1000;
     return filter->last_filtered;
 }
 
-//-------------------------------·ûºÅÊı¾İ´¦Àí
+//-------------------------------ç¬¦å·æ•°æ®å¤„ç†
 
  uint16_t float_to_str(char *buf, uint16_t buf_size, float value, int decimals)
 {
     char *p = buf;
     char *end = buf + buf_size;
 
-    /* ´¦Àí·ûºÅ */
+    /* å¤„ç†ç¬¦å· */
     if (value < 0.0f) {
         if (p < end) *p++ = '-';
         value = -value;
     }
 
-    /* Ëõ·ÅÏµÊı */
+    /* ç¼©æ”¾ç³»æ•° */
     uint32_t scale = 1;
     for (int i = 0; i < decimals; i++) scale *= 10;
 
@@ -89,7 +89,7 @@ int32_t LowPassFilter_Process(LowPassFilter *filter, int32_t raw_data) {
     uint32_t integer = scaled / scale;
     uint32_t frac    = scaled % scale;
 
-    /* Èç¹û scaled ÊÇ 0,Ç°ÃæµÄ¸ººÅÒªÈ¥µô */
+    /* å¦‚æœ scaled æ˜¯ 0,å‰é¢çš„è´Ÿå·è¦å»æ‰ */
     if (scaled == 0 && p > buf && *(p - 1) == '-') {
         p--;
     }
@@ -101,20 +101,20 @@ int32_t LowPassFilter_Process(LowPassFilter *filter, int32_t raw_data) {
     p += n;
     return (uint16_t)(p - buf);
 }
-//-----------------------------------½Ç¶È¹éÒ»»¯--------------
-// ½Ç¶È¹éÒ»»¯£º½«ÈÎÒâ½Ç¶È×ª»»µ½¡À180¡ã·¶Î§ÄÚ£¬³¬¹ı180¡ã×Ô¶¯ÕÛ»Ø
- float normalize_angle(float angle_diff)   // Ö»ÕÛµşÎó²î,·µ»Ø ¡À180 ÄÚµÄÎó²î
+//-----------------------------------è§’åº¦å½’ä¸€åŒ–--------------
+// è§’åº¦å½’ä¸€åŒ–ï¼šå°†ä»»æ„è§’åº¦è½¬æ¢åˆ°Â±180Â°èŒƒå›´å†…ï¼Œè¶…è¿‡180Â°è‡ªåŠ¨æŠ˜å›
+ float normalize_angle(float angle_diff)   // åªæŠ˜å è¯¯å·®,è¿”å› Â±180 å†…çš„è¯¯å·®
 {
     while (angle_diff > 180.0f)  angle_diff -= 360.0f;
     while (angle_diff < -180.0f) angle_diff += 360.0f;
     return angle_diff;
 }
 
-//-----------------------------------ÕıÏÒº¯Êı----------------------------
+//-----------------------------------æ­£å¼¦å‡½æ•°----------------------------
 
 float sine_target_int(sine_sweep *sin_gain)
 {
-    sin_gain->time_all += sin_gain->time;   // ÀÛ¼Ó 2ms,Ö±½Ó¸Ä½á¹¹ÌåÀïµÄ time
+    sin_gain->time_all += sin_gain->time;   // ç´¯åŠ  2ms,ç›´æ¥æ”¹ç»“æ„ä½“é‡Œçš„ time
 
     float sin_out = sin_gain->offset
                   + sin_gain->amplitude * sinf(2.0f * PI * sin_gain->frequency * sin_gain->time_all + sin_gain->phase);
