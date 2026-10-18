@@ -43,6 +43,9 @@ static void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl);
 //遥控器控制变量
 RC_ctrl_t rc_ctrl;
 
+/* 最近一次成功解析完整帧的 tick（掉线检测用；在串口中断里更新） */
+static volatile uint32_t rc_last_update_tick = 0;
+
 //receive data, 18 bytes one frame, but set 36 bytes 
 //接收原始数据，为18个字节，给了36个字节长度，防止DMA传输越界
 static uint8_t sbus_rx_buf[2][SBUS_RX_BUF_NUM];
@@ -74,6 +77,16 @@ void remote_control_init(void)
 const RC_ctrl_t *get_remote_control_point(void)
 {
     return &rc_ctrl;
+}
+
+/**
+  * @brief          遥控器是否掉线
+  * @retval         1 = 掉线，0 = 在线
+  * @note           上电后尚未收到任何完整帧时 tick 仍为 0，同样判为掉线（安全侧）
+  */
+uint8_t rc_is_offline(void)
+{
+    return (uint8_t)((HAL_GetTick() - rc_last_update_tick) > RC_OFFLINE_TIMEOUT_MS);
 }
 
 
@@ -191,4 +204,7 @@ static void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl)
     rc_ctrl->rc.ch[2] -= RC_CH_VALUE_OFFSET;
     rc_ctrl->rc.ch[3] -= RC_CH_VALUE_OFFSET;
     rc_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
+
+    /* 完整帧解析成功 -> 刷新掉线检测时间戳 */
+    rc_last_update_tick = HAL_GetTick();
 }

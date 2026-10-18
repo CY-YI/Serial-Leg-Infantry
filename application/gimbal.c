@@ -70,7 +70,10 @@ void gimbal_task(void const *pvParameters)
         
         /* 阶段4:CAN 发送 */
         gimbal_stage = 4;
-        CAN_cmd_chassis(0, 0, test_out, 0);
+        /* 2026-10-07 底盘开发：CAN1 0x200 已由 chassis_task 接管，
+           此处正弦测试发送停用（避免两个任务互相覆盖指令）。
+           恢复正弦测试时先停用 chassis_task 阶段5的发送。 */
+        // CAN_cmd_chassis(0, 0, test_out, 0);
         
         /* 阶段5:循环计数 + tick 监控 */
         gimbal_stage = 5;

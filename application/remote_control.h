@@ -89,6 +89,15 @@ typedef __packed struct
   * @retval         none
   */
 extern void remote_control_init(void);
+
+/* ----------------------- 掉线检测（MVU-5） ------------------------------- */
+#define RC_OFFLINE_TIMEOUT_MS   ((uint32_t)100)   /* 超过此时长无完整帧判掉线 */
+
+/**
+  * @brief          遥控器是否掉线
+  * @retval         1 = 掉线（超时未收到完整帧），0 = 在线
+  */
+extern uint8_t rc_is_offline(void);
 /**
   * @brief          get remote control data point
   * @param[in]      none

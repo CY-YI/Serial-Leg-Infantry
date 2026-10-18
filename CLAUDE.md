@@ -2,6 +2,7 @@
 
 > 大疆 RoboMaster 串腿步兵机器人固件。STM32F407 + FreeRTOS + Keil MDK。
 > 维护者：@CY
+> 项目文档入口：`文档管理/00_总览.md`（需求 / 架构 / 进度 / 调研 / 交接）
 
 ---
 
@@ -43,7 +44,10 @@
 | 备用构建 | EIDE（VSCode 插件），配置在 `MDK-ARM/.eide/eide.yml` |
 | CubeMX 工程 | `Serial Leg Infantry.ioc`（根目录） |
 
-**编译方式**：目前只能在 Keil 里手动编译（命令行工具路径待确认）。
+**编译方式**：Keil 图形界面手动编译；**也可用命令行 armcc 做快速质检**
+（`D:\keil5\ARM\ARMCC\Bin\armcc.exe`，V5.06 update 7 build 960，
+完整参数见 `文档管理/05_交接文档.md` §五 第 3 条）。命令行能查语法/类型错误，
+链接与最终产物仍需 Keil。
 
 > `Core/` 下的文件由 CubeMX 生成。**改代码只能写在 `/* USER CODE BEGIN ... */` 和
 > `/* USER CODE END ... */` 之间**，否则重新生成代码时会被冲掉。
@@ -62,6 +66,7 @@
 | `TEST/` | 测试代码 | **参与编译**，不是废代码，改动需谨慎 |
 | `Drivers/` `Middlewares/` | HAL 库 + FreeRTOS + DSP | **第三方库，不要改** |
 | `tools/` | 维护脚本 | 编码/注释修复工具 |
+| `文档管理/` | 项目文档 | 需求/架构/调研/参考文档集中存放，勿散落别处 |
 | `MDK-ARM/` | Keil 工程与构建产物 | |
 
 > `algorithm/optimization_algorithm/AHRS.lib` 和 `arm_cortexM4lf_math.lib` 是**预编译库**，
@@ -78,6 +83,7 @@
 | `defaultTask` | `StartDefaultTask` | Normal | 128 | 空转占位，只 `osDelay(1)` |
 | `imuTask` | `INS_task` | **Realtime** | 1024 | 姿态解算，优先级最高 |
 | `gimbal` | `gimbal_task` | High | 1024 | 云台控制 |
+| `chassis` | `chassis_task` | High | 512 | 底盘控制（2ms 周期，开发中见 MVU-3） |
 
 关键配置（`Core/Inc/FreeRTOSConfig.h`）：tick 1000Hz、最大优先级 7、堆 24576 字节。
 
@@ -89,7 +95,7 @@
 
 **调试工具**：VOFA+（波形）、J-Link/ST-Link（硬件调试）、逻辑分析仪（总线抓包）、CAN 分析仪。
 
-**VOFA+ 监控变量**（定义在 `application/gimbal.c`）：
+**VOFA+ 监控变量**（定义在 `application/gimbal.c` 与 `application/chassis.c`）：
 
 | 变量 | 含义 |
 |------|------|
@@ -99,6 +105,10 @@
 | `can_tx_fail_count` | CAN 发送失败计数 |
 | `test_iput_angle` | PID 角度环输出 |
 | `angle_diff` | 目标角度与实际角度差值 |
+| `chassis_stage` | 底盘任务执行阶段 1-6 |
+| `chassis_loop_count` | 底盘循环计数（正常约 500/s） |
+| `chassis_tick_delta` | 底盘两次循环 tick 差（正常 ≈2ms） |
+| `chassis_vx` / `chassis_vy` / `chassis_v_rot` | 底盘解算中间量（RPM） |
 
 **问题记录**：所有问题都记在 `ISSUES.md`（已有完整的模板和分类标签），
 修复后补根因分析和解决方案。遇到新坑请顺手记录。
@@ -123,3 +133,7 @@
 - 执行维护类操作时，优先把逻辑写成 `tools/` 下的脚本文件再调用，
   这样权限弹窗里只显示一行易读的命令，用户也能自己审查脚本。
 - 破坏性操作（批量改文件、覆盖）必须先试运行、显示对照，确认后再执行。
+- **用 Write 工具整体覆盖源文件后必须补回 BOM**（Write 不保留 BOM）：
+  检查 `head -c 3 文件 | xxd` 应为 `efbbbf`；缺失时用 `tools/fix_encoding.py` 或手动补。
+- Python 脚本向终端输出中文时，命令加 `PYTHONIOENCODING=utf-8` 前缀；
+  不要用 bash 内嵌反引号写含代码片段的文本（会被命令替换吞掉，此前损坏过文档）。

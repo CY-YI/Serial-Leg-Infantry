@@ -1216,6 +1216,26 @@
               <FileType>1</FileType>
               <FilePath>..\application\INS_task.c</FilePath>
             </File>
+            <File>
+              <FileName>chassis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\chassis.c</FilePath>
+            </File>
+            <File>
+              <FileName>chassis.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\application\chassis.h</FilePath>
+            </File>
+            <File>
+              <FileName>demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>demo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\application\demo.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

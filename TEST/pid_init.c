@@ -71,29 +71,31 @@ void pid_all_init(void){
 //----------------------------------------------------  
     
     //底盘
+    // 底盘 max_iout 由 100 改为 1500：tools/sim_chassis.py 仿真结论——
+    // 100 时稳态误差约 -270 RPM（积分输出不足以补偿稳态电流），1500 时误差归零
 	PID_init(&all_motor_pid.pid_front_right,
 		 PID_POSITION,
 		 all_motor_pid.pid_front_right.pid_parameter,
 		 10000,
-		 100);
+		 1500);
 		
 	PID_init(&all_motor_pid.pid_front_left,
 		 PID_POSITION,
 		 all_motor_pid.pid_back_left.pid_parameter,
 		 10000,
-		 100);
+		 1500);
 	
 	PID_init(&all_motor_pid.pid_back_left,
 		 PID_POSITION,
 		 all_motor_pid.pid_back_left.pid_parameter,
 		 10000,
-		 100);
+		 1500);
 		 
 	PID_init(&all_motor_pid.pid_back_right,
 		 PID_POSITION,
 		 all_motor_pid.pid_back_left.pid_parameter,
 		 10000,
-		 100);
+		 1500);
 		 
          
          

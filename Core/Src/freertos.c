@@ -27,12 +27,14 @@
 /* USER CODE BEGIN Includes */
 #include "INS_task.h"
 #include "gimbal.h"
+#include "chassis.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 osThreadId imuTaskHandle;
 osThreadId gimbalHandle;
+osThreadId chassisHandle;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -131,6 +133,10 @@ void MX_FREERTOS_Init(void) {
   // 定义并创建 gimbal 任务
   osThreadDef(gimbal, gimbal_task, osPriorityHigh, 0, 1024);
   gimbalHandle = osThreadCreate(osThread(gimbal), NULL);
+
+  // 定义并创建 chassis 任务（底盘控制，2ms 周期）
+  osThreadDef(chassis, chassis_task, osPriorityHigh, 0, 512);
+  chassisHandle = osThreadCreate(osThread(chassis), NULL);
 		
   /* USER CODE END RTOS_THREADS */
 
