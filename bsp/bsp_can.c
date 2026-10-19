@@ -15,12 +15,6 @@ motor_system_t motor;
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
-/* 在文件顶部加全局变量 */
-extern volatile uint32_t gimbal_curr_tick;   /* gimbal.c 里定义的 */
-extern volatile uint32_t gimbal_loop_count ;            /* CAN 接收帧计数 */
-extern  volatile uint32_t gimbal_last_tick ;
-static uint32_t loop_unchanged_count = 0;
-
 #define get_motor_measure(ptr, data)                                    \
     {                                                                   \
         (ptr)->last_ecd = (ptr)->ecd;                                   \
@@ -164,29 +158,13 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
     chassis_can_send_data[6] = motor4 >> 8;
     chassis_can_send_data[7] = motor4;
 
-    /* 每 100 次循环检查一次 gimbal_task 心跳 */
-    if (gimbal_loop_count % 100 == 0) {
-        if ((HAL_GetTick() - gimbal_curr_tick) >= 10) {
-            /* gimbal_task 超过 10ms 未更新 */
-            loop_unchanged_count++;
-
-            /* 连续 2 次检测都没变化(=200ms task 停跑)→ 强制发零 */
-            if (loop_unchanged_count >= 2) {
-                /* 直接在这里发零指令,不走 gimbal_task */
-                for (int i = 0; i < 8; i++) {
-                    chassis_can_send_data[i] = 0;
-                }
-
-                HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-                return;
-            }
-        } else {
-            /* task 还在跑,重置计数 */
-            gimbal_last_tick = gimbal_curr_tick;
-            loop_unchanged_count = 0;
-        }
-    }
-
+    /* CH-01 已移除（2026-10-19）：
+       原先此处内嵌"gimbal 心跳看门狗"——gimbal_task 停跑时会把底盘整帧清零。
+       移除理由：
+         1. 0x200 已由 chassis_task 独占，底盘输出不应受云台状态影响；
+         2. 保护对象错位（云台挂了却让底盘失力），且云台当前只有正弦测试；
+         3. 它是"电机莫名停一下"的潜在来源，无任何收益。
+       详见 ISSUES.md CH-01。 */
     HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
 //GM6020 0x1FF为id 1到4 0x2FF为id 4到8  0x1FE为流控
