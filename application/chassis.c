@@ -152,7 +152,7 @@ void chassis_task(void const *pvParameters)
         chassis_stage = 5;
         if (chassis_mode == CHASSIS_LOCK)
         {
-            CAN_cmd_chassis(0, 0, 0, 0);
+            CAN_cmd_chassis(0, 0, 1000, 0);
         }
         else
         {
@@ -261,13 +261,13 @@ void chassis_set_control(void)
     if (A6020_speed >  FOLLOW_ROT_MAX_RPM) A6020_speed =  FOLLOW_ROT_MAX_RPM;
     if (A6020_speed < -FOLLOW_ROT_MAX_RPM) A6020_speed = -FOLLOW_ROT_MAX_RPM;
 
-    /* ---- 3. 摇杆 + 键盘 W/S/A/D 叠加（老版公式原样，符号 TODO-接线标定 实车验证） ---- */
-    /* 摇杆通道符号（2026-10-19 用户确认）：
-       ch3 正 = 前进、负 = 后退；ch2 正 = 左移。
-       键盘：W/S = 前/后，A/D = 左/右。
-       本工程约定 x 正 = 左、y 正 = 前，所以 vy 不再取负。 */
-    x = RC->rc.ch[2] + FlagCheck(RC->key.v & KEY_PRESSED_OFFSET_A) * KEYBOARD_MAX_SPEED
-                     - FlagCheck(RC->key.v & KEY_PRESSED_OFFSET_D) * KEYBOARD_MAX_SPEED;
+    /* ---- 3. 摇杆 + 键盘 W/S/A/D 叠加
+       通道符号（2026-10-19 实机确认）：
+         ch3 正 = 前进、负 = 后退   → y 正 = 前进
+         ch2 正 = 右移、负 = 左移   → x 正 = 右移（配合第 4 步 vy 取负变左正）
+       键盘：W/S = 前/后，A/D = 左/右（与摇杆同向） ---- */
+    x = RC->rc.ch[2] - FlagCheck(RC->key.v & KEY_PRESSED_OFFSET_A) * KEYBOARD_MAX_SPEED
+                     + FlagCheck(RC->key.v & KEY_PRESSED_OFFSET_D) * KEYBOARD_MAX_SPEED;
     y = RC->rc.ch[3] + FlagCheck(RC->key.v & KEY_PRESSED_OFFSET_W) * KEYBOARD_MAX_SPEED
                      - FlagCheck(RC->key.v & KEY_PRESSED_OFFSET_S) * KEYBOARD_MAX_SPEED;
 
@@ -291,10 +291,11 @@ void chassis_set_control(void)
     }
 
     /* ---- 4. 通道值域 -> RPM 域（底盘系/操作者系平移量）
-       ch3 正=前进 -> vx 正；ch2 正=左移 -> vy 正（坐标系约定 vy 左为正）
-       实车若左右整体相反，再把 vy_local 取负 */
-    vx_local = (float)ramp_vy / RC_MAX_RANGE * MAX_GIVEN_SPEED;
-    vy_local = (float)ramp_vx / RC_MAX_RANGE * MAX_GIVEN_SPEED;
+       ch3 正=前进 -> vx 正；
+       ch2 正=右移，而坐标系约定 vy 左为正，故对 ch2 取负
+       （实车若左右整体相反，再把 vy_local 取反） ---- */
+    vx_local =  (float)ramp_vy / RC_MAX_RANGE * MAX_GIVEN_SPEED;
+    vy_local = -(float)ramp_vx / RC_MAX_RANGE * MAX_GIVEN_SPEED;
 
     /* ---- 5. yaw_delta 旋转矩阵：操作者系平移 -> 底盘系
            借鉴 StandardRobotpp：vx_c = vx·cos - vy·sin，vy_c = vx·sin + vy·cos
@@ -327,15 +328,15 @@ void chassis_set_v(void)
     /* 键盘 W/S/A/D：满速平移（老版 v_max） */
     if (RC->key.v & KEY_PRESSED_OFFSET_W) target_vx =  V_MAX;
     if (RC->key.v & KEY_PRESSED_OFFSET_S) target_vx = -V_MAX;
-    if (RC->key.v & KEY_PRESSED_OFFSET_A) target_vy =  V_MAX;   /* A=左 -> +vy */
-    if (RC->key.v & KEY_PRESSED_OFFSET_D) target_vy = -V_MAX;   /* D=右 -> -vy */
+    if (RC->key.v & KEY_PRESSED_OFFSET_A) target_vy = -V_MAX;
+    if (RC->key.v & KEY_PRESSED_OFFSET_D) target_vy =  V_MAX;
 
     /* 无键盘时用摇杆（低通滤波 + ×5 增益，老版 0.8/0.2 手感与量纲） */
     if (target_vx == 0.0f && target_vy == 0.0f)
     {
         /* TODO-接线标定: 摇杆通道符号（ch2 左右 / ch3 前后）实车验证 */
-        lp_vx = 0.8f * lp_vx + 0.2f * ((float)RC->rc.ch[3] * 5.0f);   /* ch3 正=前进 */
-        lp_vy = 0.8f * lp_vy + 0.2f * ((float)RC->rc.ch[2] * 5.0f);    /* ch2 正=左移 */
+        lp_vx = 0.8f * lp_vx + 0.2f * ((float)RC->rc.ch[3] * 5.0f);
+        lp_vy = 0.8f * lp_vy + 0.2f * (-(float)RC->rc.ch[2] * 5.0f);
         chassis_vx = lp_vx;
         chassis_vy = lp_vy;
     }
